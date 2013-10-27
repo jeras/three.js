@@ -80,9 +80,14 @@
 
                                 // CA array
                                 var ca_array = [
-                                        [1, 0],
-                                        [0, 1],
-                                        [1, 0],
+                                        [1, 0, 1, 0, 0, 1, 0],
+                                        [0, 1, 1, 1, 1, 1, 1],
+                                        [1, 1, 0, 1, 1, 0, 1],
+                                        [1, 1, 0, 1, 1, 0, 1],
+                                        [1, 1, 0, 1, 1, 0, 1],
+                                        [1, 1, 0, 1, 1, 0, 1],
+                                        [1, 1, 0, 1, 1, 0, 1],
+                                        [1, 0, 0, 0, 0, 0, 0]
                                 ];
                                 var ca_x = 0;
                                 var ca_y = 0;
@@ -90,50 +95,55 @@
                                 console.log("size of ca_array[0] is: ", ca_array[0].length);
                                 var tmp = [];
                                 for (ca_y = 0; ca_y < ca_array.length; ca_y++) {
-                                         for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                  if (ca_x != 0                    ) tmp.push ( new THREE.Vector4 ( 100*(ca_x-0.5), -100, 100*ca_array[ca_y][ca_x], 1 ) );
-                                                                                     tmp.push ( new THREE.Vector4 ( 100*(ca_x    ), -100, 100*ca_array[ca_y][ca_x], 1 ) );
-                                                  if (ca_x != ca_array[ca_y].length) tmp.push ( new THREE.Vector4 ( 100*(ca_x+0.5), -100, 100*ca_array[ca_y][ca_x], 1 ) );
+                                         if (ca_y != 0) {
+                                                  var tmp_x = [];
+                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                  }
+                                                  tmp.push(tmp_x);
+                                         }
+                                                  var tmp_x = [];
+                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                  }
+                                                  tmp.push(tmp_x);
+                                         if (ca_y != ca_array.length-1) {
+                                                  var tmp_x = [];
+                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                  }
+                                                  tmp.push(tmp_x);
                                          }
                                 }
+                                console.log("tmp is: ", tmp);
 
 				// NURBS surface
-
-				var nsControlPoints = [
-					[       new THREE.Vector4 (    0,    0, 100*ca_array[0][0], 1 ),
-						new THREE.Vector4 (    0,   50, 100*ca_array[0][0], 1 ),
-						new THREE.Vector4 (    0,   50, 100*ca_array[0][1], 1 ),
-						new THREE.Vector4 (    0,  100, 100*ca_array[0][1], 1 )		],
-					[	new THREE.Vector4 (   50,    0, 100*ca_array[0][0], 1 ),
-						new THREE.Vector4 (   50,   50, 100*ca_array[0][0], 1 ),
-						new THREE.Vector4 (   50,   50, 100*ca_array[0][1], 1 ),
-						new THREE.Vector4 (   50,  100, 100*ca_array[0][1], 1 ) 	],
-					[       new THREE.Vector4 (   50,    0, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (   50,   50, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (   50,   50, 100*ca_array[1][1], 1 ),
-						new THREE.Vector4 (   50,  100, 100*ca_array[1][1], 1 )		],
-					[       new THREE.Vector4 (  100,    0, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (  100,   50, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (  100,   50, 100*ca_array[1][1], 1 ),
-						new THREE.Vector4 (  100,  100, 100*ca_array[1][1], 1 )		],
-					[	new THREE.Vector4 (  150,    0, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (  150,   50, 100*ca_array[1][0], 1 ),
-						new THREE.Vector4 (  150,   50, 100*ca_array[1][1], 1 ),
-						new THREE.Vector4 (  150,  100, 100*ca_array[1][1], 1 )		],
-					[	new THREE.Vector4 (  150,    0, 100*ca_array[2][0], 1 ),
-						new THREE.Vector4 (  150,   50, 100*ca_array[2][0], 1 ),
-						new THREE.Vector4 (  150,   50, 100*ca_array[2][1], 1 ),
-						new THREE.Vector4 (  150,  100, 100*ca_array[2][1], 1 ) 	],
-					[	new THREE.Vector4 (  200,    0, 100*ca_array[2][0], 1 ),
-						new THREE.Vector4 (  200,   50, 100*ca_array[2][0], 1 ),
-						new THREE.Vector4 (  200,   50, 100*ca_array[2][1], 1 ),
-						new THREE.Vector4 (  200,  100, 100*ca_array[2][1], 1 )		]
-				];
 				var degree_y = 3;
 				var degree_x = 3;
-				var knots_y = [0, 0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1, 1];
-				var knots_x = [0, 0, 0, 0, 1, 1, 1, 1];
-				var nurbsSurface = new THREE.NURBSSurface(degree_y, degree_x, knots_y, knots_x, nsControlPoints);
+				var knots_0 = [0, 0, 0, 0];
+				var knots_1 = [1, 1, 1, 1];
+                                var knots_y = [];
+                                for (ca_y = 1; ca_y < ca_array.length-1; ca_y++) {
+                                	var knot = ca_y * 1/(ca_array.length-1)
+					var knots = [knot, knot, knot];
+                                	knots_y = knots_y.concat(knots);
+                                }
+                                knots_y = knots_0.concat(knots_y, knots_1);
+                                var knots_x = [];
+                                for (ca_x = 1; ca_x < ca_array[0].length-1; ca_x++) {
+                                	var knot = ca_x * 1/(ca_array[0].length-1)
+					var knots = [knot, knot, knot];
+                                	knots_x = knots_x.concat(knots);
+                                }
+                                knots_x = knots_0.concat(knots_x, knots_1);
+                                console.log("knots(y,x) is: ", knots_y, knots_x);
+				var nurbsSurface = new THREE.NURBSSurface(degree_y, degree_x, knots_y, knots_x, tmp);
 
 				var map = THREE.ImageUtils.loadTexture( 'texture.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
@@ -143,7 +153,7 @@
 					return nurbsSurface.getPoint(u, v);
 				};
 
-				var geometry = new THREE.ParametricGeometry( getSurfacePoint, 20, 20 );
+				var geometry = new THREE.ParametricGeometry( getSurfacePoint, 10*(ca_array[0].length-1), 10*(ca_array.length-1) );
 				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 				var object = new THREE.Mesh( geometry, material );
 				object.position.set( 0, 100, 0 );
