@@ -75,19 +75,19 @@
 				scene.add( light );
 
 				group = new THREE.Object3D();
-				group.position.y = 50;
+				group.scale.multiplyScalar( 50 );
 				scene.add( group );
 
                                 // CA array
                                 var ca_array = [
-                                        [1, 0, 1, 0, 0, 1, 0],
-                                        [0, 1, 1, 1, 1, 1, 1],
-                                        [1, 1, 0, 1, 1, 0, 1],
-                                        [1, 1, 0, 1, 1, 0, 1],
-                                        [1, 1, 0, 1, 1, 0, 1],
-                                        [1, 1, 0, 1, 1, 0, 1],
-                                        [1, 1, 0, 1, 1, 0, 1],
-                                        [1, 0, 0, 0, 0, 0, 0]
+                                        [1, 0, 1, 0],
+                                        [0, 1, 1, 1],
+                                        [1, 1, 0, 1],
+                                        [1, 1, 0, 1],
+                                        [1, 1, 0, 0],
+                                        [1, 1, 0, 0],
+                                        [1, 1, 0, 1],
+                                        [1, 0, 0, 0]
                                 ];
                                 var ca_x = 0;
                                 var ca_y = 0;
@@ -98,25 +98,25 @@
                                          if (ca_y != 0) {
                                                   var tmp_x = [];
                                                   for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y-0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
                                                   }
                                                   tmp.push(tmp_x);
                                          }
                                                   var tmp_x = [];
                                                   for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y    ), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
                                                   }
                                                   tmp.push(tmp_x);
                                          if (ca_y != ca_array.length-1) {
                                                   var tmp_x = [];
                                                   for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x-0.5), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( 100*(ca_x    ), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( 100*(ca_x+0.5), 100*(ca_y+0.5), 100*ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
+                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
+                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
                                                   }
                                                   tmp.push(tmp_x);
                                          }
@@ -153,12 +153,36 @@
 					return nurbsSurface.getPoint(u, v);
 				};
 
-				var geometry = new THREE.ParametricGeometry( getSurfacePoint, 10*(ca_array[0].length-1), 10*(ca_array.length-1) );
-				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
-				var object = new THREE.Mesh( geometry, material );
-				object.position.set( 0, 100, 0 );
-				object.scale.multiplyScalar( 1 );
-				group.add( object );
+				var preimage_g = new THREE.ParametricGeometry( getSurfacePoint, 10*(ca_array[0].length-1), 10*(ca_array.length-1) );
+				//var preimage_m = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
+				var preimage_m = new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide } );
+				var preimage_o = new THREE.Mesh( preimage_g, preimage_m );
+				group.add( preimage_o );
+
+				// grid
+				var grid_x_g = new THREE.Geometry();
+				var grid_y_g = new THREE.Geometry();
+
+				grid_x_g.vertices.push( new THREE.Vector3(                    0, 0, 0 ) );
+				grid_x_g.vertices.push( new THREE.Vector3( ca_array[0].length-1, 0, 0 ) );
+				grid_x_g.vertices.push( new THREE.Vector3(                    0, 0, 1 ) );
+				grid_x_g.vertices.push( new THREE.Vector3( ca_array[0].length-1, 0, 1 ) );
+				grid_x_g.faces.push( new THREE.Face3( 0, 1, 2 ) );
+				grid_x_g.faces.push( new THREE.Face3( 3, 1, 2 ) );
+
+				grid_y_g.vertices.push( new THREE.Vector3( 0,                 0, 0 ) );
+				grid_y_g.vertices.push( new THREE.Vector3( 0, ca_array.length-1, 0 ) );
+				grid_y_g.vertices.push( new THREE.Vector3( 0,                 0, 1 ) );
+				grid_y_g.vertices.push( new THREE.Vector3( 0, ca_array.length-1, 1 ) );
+				grid_y_g.faces.push( new THREE.Face3( 0, 1, 2 ) );
+				grid_y_g.faces.push( new THREE.Face3( 3, 1, 2 ) );
+
+				var grid_m = new THREE.MeshLambertMaterial( { color: 0x0000ff, opacity: 0.3, transparent: true, side: THREE.DoubleSide } );
+				var grid_x_o = new THREE.Mesh( grid_x_g, grid_m );
+				var grid_y_o = new THREE.Mesh( grid_y_g, grid_m );
+                                
+                                for (ca_x = 0; ca_x < ca_array[0].length; ca_x++) { group.add( grid_y_o.clone().translateX(ca_x) ); }
+				for (ca_y = 0; ca_y < ca_array.length   ; ca_y++) { group.add( grid_x_o.clone().translateY(ca_y) ); }
 
 				//
 
