@@ -78,6 +78,10 @@
 				group.scale.multiplyScalar( 50 );
 				scene.add( group );
 
+                                // NURBS assistence
+				var preimage_m = new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide } );
+				var knots = [0, 0, 0, 0, 1, 1, 1, 1];
+
                                 // CA array
                                 var ca_array = [
                                         [1, 0, 1, 0],
@@ -91,73 +95,49 @@
                                 ];
                                 var ca_x = 0;
                                 var ca_y = 0;
-                                console.log("size of ca_array    is: ", ca_array.length);
-                                console.log("size of ca_array[0] is: ", ca_array[0].length);
-                                var tmp = [];
-                                for (ca_y = 0; ca_y < ca_array.length; ca_y++) {
-                                         if (ca_y != 0) {
-                                                  var tmp_x = [];
-                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y-0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                  }
-                                                  tmp.push(tmp_x);
-                                         }
-                                                  var tmp_x = [];
-                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y    ), ca_array[ca_y][ca_x], 1 ) );
-                                                  }
-                                                  tmp.push(tmp_x);
-                                         if (ca_y != ca_array.length-1) {
-                                                  var tmp_x = [];
-                                                  for (ca_x = 0; ca_x < ca_array[ca_y].length; ca_x++) {
-                                                           if (ca_x != 0                      ) tmp_x.push ( new THREE.Vector4 ( (ca_x-0.5), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                                                                tmp_x.push ( new THREE.Vector4 ( (ca_x    ), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                           if (ca_x != ca_array[ca_y].length-1) tmp_x.push ( new THREE.Vector4 ( (ca_x+0.5), (ca_y+0.5), ca_array[ca_y][ca_x], 1 ) );
-                                                  }
-                                                  tmp.push(tmp_x);
+                                console.log("DEBUG");
+						getSurfacePoint = function(u, v) {
+							return nurbsSurface.getPoint(u, v);
+						};
+                                for (ca_y = 0; ca_y < ca_array.length-1; ca_y++) {
+                                         for (ca_x = 0; ca_x < ca_array[ca_y].length-1; ca_x++) {
+                                		  var tmp = [
+                                                          [
+                                                                  new THREE.Vector4 ( 0  , 0  , ca_array[ca_y  ][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y  ][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y+1][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0  , 1  , ca_array[ca_y+1][ca_x  ], 1 )
+                                                          ],
+                                                          [
+                                                                  new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y  ][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y+1][ca_x  ], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x  ], 1 )
+                                                          ],
+                                                          [
+                                                                  new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y  ][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y+1][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x+1], 1 )
+                                                          ],
+                                                          [
+                                                                  new THREE.Vector4 ( 1  , 0  , ca_array[ca_y  ][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y  ][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y+1][ca_x+1], 1 ),
+                                                                  new THREE.Vector4 ( 1  , 1  , ca_array[ca_y+1][ca_x+1], 1 )
+                                                          ]
+                                                  ];
+
+						// NURBS surface
+						var nurbsSurface = new THREE.NURBSSurface(3, 3, knots, knots, tmp);
+						var preimage_g = new THREE.ParametricGeometry( getSurfacePoint, 10, 10 );
+						var preimage_o = new THREE.Mesh( preimage_g, preimage_m );
+                                                preimage_o.position.set(ca_x, ca_y, 0);
+						group.add( preimage_o );
                                          }
                                 }
                                 console.log("tmp is: ", tmp);
 
-				// NURBS surface
-				var degree_y = 3;
-				var degree_x = 3;
-				var knots_0 = [0, 0, 0, 0];
-				var knots_1 = [1, 1, 1, 1];
-                                var knots_y = [];
-                                for (ca_y = 1; ca_y < ca_array.length-1; ca_y++) {
-                                	var knot = ca_y * 1/(ca_array.length-1)
-					var knots = [knot, knot, knot];
-                                	knots_y = knots_y.concat(knots);
-                                }
-                                knots_y = knots_0.concat(knots_y, knots_1);
-                                var knots_x = [];
-                                for (ca_x = 1; ca_x < ca_array[0].length-1; ca_x++) {
-                                	var knot = ca_x * 1/(ca_array[0].length-1)
-					var knots = [knot, knot, knot];
-                                	knots_x = knots_x.concat(knots);
-                                }
-                                knots_x = knots_0.concat(knots_x, knots_1);
-                                console.log("knots(y,x) is: ", knots_y, knots_x);
-				var nurbsSurface = new THREE.NURBSSurface(degree_y, degree_x, knots_y, knots_x, tmp);
-
-				var map = THREE.ImageUtils.loadTexture( 'texture.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
-
-				getSurfacePoint = function(u, v) {
-					return nurbsSurface.getPoint(u, v);
-				};
-
-				var preimage_g = new THREE.ParametricGeometry( getSurfacePoint, 10*(ca_array[0].length-1), 10*(ca_array.length-1) );
-				//var preimage_m = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
-				var preimage_m = new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide } );
-				var preimage_o = new THREE.Mesh( preimage_g, preimage_m );
-				group.add( preimage_o );
 
 				// grid
 				var grid_x_g = new THREE.Geometry();
