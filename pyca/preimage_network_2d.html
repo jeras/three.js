@@ -102,8 +102,7 @@
         cube_o.position.set(-2, 2, 1);
         group.add( cube_o );
 
-
-                                // NURBS assistence
+        // NURBS assistence
         var preimage_m = new THREE.MeshLambertMaterial( { color: 0x73ff00, ambient: 0x73ff00, opacity: 0.5, transparent: true, side: THREE.DoubleSide } );
         //var preimage_m = new THREE.MeshPhongMaterial( { color: 0x73ff00, ambient: 0x73ff00, opacity: 0.3, refractionRatio: 1.45, transparent: true, side: THREE.DoubleSide } );
         var knots = [0, 0, 0, 0, 1, 1, 1, 1];
@@ -192,7 +191,7 @@
               var nurbsCurve = new THREE.NURBSCurve(3, knots, tmp[i]);
               var edge_g = new THREE.Geometry();
               edge_g.vertices = nurbsCurve.getPoints(200);
-              var edge_m = new THREE.LineBasicMaterial( { linewidth: 0.1, color: 0x333333, transparent: true } );
+              var edge_m = new THREE.LineBasicMaterial( { linewidth: 0.1, color: 0x333333, ambient: 0x333333, transparent: true } );
     
               var edge = new THREE.Line( edge_g, edge_m );
               edge_o.add( edge );
