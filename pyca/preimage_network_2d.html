@@ -107,6 +107,106 @@
         //var preimage_m = new THREE.MeshPhongMaterial( { color: 0x73ff00, ambient: 0x73ff00, opacity: 0.3, refractionRatio: 1.45, transparent: true, side: THREE.DoubleSide } );
         var knots = [0, 0, 0, 0, 1, 1, 1, 1];
 
+        // CA definition
+        var N = 2; // number of states
+
+        // draw all possible neighborhoods
+        var x = 0;
+        var y = 0;
+        var n = 0;  // neighborhood index
+        var neighborhood_images = [];
+        getSurfacePoint = function(u, v) {
+          return nurbsSurface.getPoint(u, v);
+        };
+        for (n = 0; n < Math.pow(N, 4); n++) {
+          var neighborhood = [ [0,0], [0,0] ];
+          for (y = 0; y < 2; y++) {
+            for (x = 0; x < 2; x++) {
+              // explicit integer division
+              neighborhood [y][x] = ((n / Math.pow(N, 2*y+x) >> 0) % N);
+            }
+          }
+          // NURBS surface
+          var neighborhood_surface = [
+            [
+              new THREE.Vector4 ( 0  , 0  , neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0  , 0.5, neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0  , 0.5, neighborhood[1][0], 1 ),
+              new THREE.Vector4 ( 0  , 1  , neighborhood[1][0], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 0.5, 0  , neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0.5, 0.5, neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0.5, 0.5, neighborhood[1][0], 1 ),
+              new THREE.Vector4 ( 0.5, 1  , neighborhood[1][0], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 0.5, 0  , neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 0.5, 0.5, neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 0.5, 0.5, neighborhood[1][1], 1 ),
+              new THREE.Vector4 ( 0.5, 1  , neighborhood[1][1], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 1  , 0  , neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 1  , 0.5, neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 1  , 0.5, neighborhood[1][1], 1 ),
+              new THREE.Vector4 ( 1  , 1  , neighborhood[1][1], 1 )
+            ]
+          ];
+    
+          //console.log(neighborhood_surface);
+          console.log(neighborhood);
+
+          var nurbsSurface = new THREE.NURBSSurface(3, 3, knots, knots, neighborhood_surface);
+          var preimage_g = new THREE.ParametricGeometry( getSurfacePoint, 10, 10 );
+          var preimage_o = new THREE.Mesh( preimage_g, preimage_m );
+    
+          // NURBS curve
+          var neighborhood_overlap = [
+            [
+              new THREE.Vector4 ( 0  , 0  , neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0  , 0.5, neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0  , 0.5, neighborhood[1][0], 1 ),
+              new THREE.Vector4 ( 0  , 1  , neighborhood[1][0], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 0  , 1  , neighborhood[1][0], 1 ),
+              new THREE.Vector4 ( 0.5, 1  , neighborhood[1][0], 1 ),
+              new THREE.Vector4 ( 0.5, 1  , neighborhood[1][1], 1 ),
+              new THREE.Vector4 ( 1  , 1  , neighborhood[1][1], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 1  , 1  , neighborhood[1][1], 1 ),
+              new THREE.Vector4 ( 1  , 0.5, neighborhood[1][1], 1 ),
+              new THREE.Vector4 ( 1  , 0.5, neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 1  , 0  , neighborhood[0][1], 1 )
+            ],
+            [
+              new THREE.Vector4 ( 1  , 0  , neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 0.5, 0  , neighborhood[0][1], 1 ),
+              new THREE.Vector4 ( 0.5, 0  , neighborhood[0][0], 1 ),
+              new THREE.Vector4 ( 0  , 0  , neighborhood[0][0], 1 )
+            ]
+          ];
+    
+          var i;
+          edge_o = new THREE.Object3D();
+          for (i = 0; i < 4; i++) {
+            var nurbsCurve = new THREE.NURBSCurve(3, knots, neighborhood_overlap[i]);
+            var edge_g = new THREE.Geometry();
+            edge_g.vertices = nurbsCurve.getPoints(200);
+            var edge_m = new THREE.LineBasicMaterial( { linewidth: 0.1, color: 0x333333, ambient: 0x333333, transparent: true } );
+    
+            var edge = new THREE.Line( edge_g, edge_m );
+            edge_o.add( edge );
+          }
+    
+          // preimage neighborhood final object
+          neighborhood_images[n] = new THREE.Object3D();
+          neighborhood_images[n].add( preimage_o );
+          neighborhood_images[n].add( edge_o );
+        }
+
         // CA array
         var ca_array = [
           [1, 0, 1, 0],
@@ -125,83 +225,18 @@
         };
         for (ca_y = 0; ca_y < ca_array.length-1; ca_y++) {
           for (ca_x = 0; ca_x < ca_array[ca_y].length-1; ca_x++) {
-            // NURBS surface
-            var tmp = [
-              [
-                new THREE.Vector4 ( 0  , 0  , ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y+1][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 1  , ca_array[ca_y+1][ca_x  ], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y+1][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x  ], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 0.5, 0.5, ca_array[ca_y+1][ca_x+1], 1 ),
-                new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x+1], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 1  , 0  , ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y+1][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 1  , ca_array[ca_y+1][ca_x+1], 1 )
-              ]
-            ];
-    
-            var nurbsSurface = new THREE.NURBSSurface(3, 3, knots, knots, tmp);
-            var preimage_g = new THREE.ParametricGeometry( getSurfacePoint, 10, 10 );
-            var preimage_o = new THREE.Mesh( preimage_g, preimage_m );
-    
-            // NURBS curve
-            var tmp = [
-              [
-                new THREE.Vector4 ( 0  , 0  , ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 0.5, ca_array[ca_y+1][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 1  , ca_array[ca_y+1][ca_x  ], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 0  , 1  , ca_array[ca_y+1][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0.5, 1  , ca_array[ca_y+1][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 1  , ca_array[ca_y+1][ca_x+1], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 1  , 1  , ca_array[ca_y+1][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y+1][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 0.5, ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 1  , 0  , ca_array[ca_y  ][ca_x+1], 1 )
-              ],
-              [
-                new THREE.Vector4 ( 1  , 0  , ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x+1], 1 ),
-                new THREE.Vector4 ( 0.5, 0  , ca_array[ca_y  ][ca_x  ], 1 ),
-                new THREE.Vector4 ( 0  , 0  , ca_array[ca_y  ][ca_x  ], 1 )
-              ]
-            ];
-    
-            var i;
-            edge_o = new THREE.Object3D();
-            for (i = 0; i < 4; i++) {
-              var nurbsCurve = new THREE.NURBSCurve(3, knots, tmp[i]);
-              var edge_g = new THREE.Geometry();
-              edge_g.vertices = nurbsCurve.getPoints(200);
-              var edge_m = new THREE.LineBasicMaterial( { linewidth: 0.1, color: 0x333333, ambient: 0x333333, transparent: true } );
-    
-              var edge = new THREE.Line( edge_g, edge_m );
-              edge_o.add( edge );
+          var n = 0;
+          for (y = 0; y < 2; y++) {
+            for (x = 0; x < 2; x++) {
+              // explicit integer division
+              n = n * N + ca_array[ca_y+y][ca_x+x]
+              neighborhood [y][x] = ((n / Math.pow(N, 2*y+x) >> 0) % N);
             }
-    
+          }
             // preimage cell position
-            preimage_o.position.set(ca_x, ca_y, 0);
-            edge_o.position.set(ca_x, ca_y, 0);
-            group.add( preimage_o );
-            group.add( edge_o );
+            var tile = neighborhood_images[n].clone();
+            tile.position.set(ca_x, ca_y, 0);
+            group.add( tile );
           }
         }
 
