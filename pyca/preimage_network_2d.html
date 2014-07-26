@@ -209,7 +209,7 @@
 
         // CA array
         var ca_array = [
-          [1, 0, 1, 0],
+          [0, 0, 1, 0],
           [0, 1, 1, 1],
           [1, 1, 0, 1],
           [1, 1, 0, 1],
@@ -230,7 +230,7 @@
             for (x = 0; x < 2; x++) {
               // explicit integer division
               n = n * N + ca_array[ca_y+y][ca_x+x]
-              neighborhood [y][x] = ((n / Math.pow(N, 2*y+x) >> 0) % N);
+//              neighborhood [y][x] = ((n / Math.pow(N, 2*y+x) >> 0) % N);
             }
           }
             // preimage cell position
@@ -266,7 +266,7 @@
         //for (ca_x = 0; ca_x < ca_array[0].length; ca_x++) { group.add( grid_y_o.position.set(ca_x, 0, 0) ); }
         //for (ca_y = 0; ca_y < ca_array.length   ; ca_y++) { group.add( grid_x_o.position.set(0, ca_y, 0) ); }
         for (ca_x = 0; ca_x < ca_array[0].length; ca_x++) { group.add( grid_y_o.clone().translateX(ca_x) ); }
-        for (ca_y = 0; ca_y < ca_array.length   ; ca_y++) { group.add( grid_x_o.clone().translateY(ca_y) ); }
+        for (ca_y = 0; ca_y < ca_array   .length; ca_y++) { group.add( grid_x_o.clone().translateY(ca_y) ); }
 
         //
 
